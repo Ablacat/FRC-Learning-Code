@@ -2,6 +2,8 @@
 
 package frc.robot;
 
+import java.util.Arrays;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -9,6 +11,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
+    public static double stickDeadband = 0.1;
+
     public static class ModuleConstants {
         public static double maxModuleAngularSpeed = 2 * Math.PI;
         public static double maxModuleAngularAcceleration = 2 * Math.PI;
@@ -56,11 +60,24 @@ public final class Constants {
         private static double trackWidthX = Units.inchesToMeters(20.5);
         private static double trackWidthY = Units.inchesToMeters(20.5);
 
-        public static SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
-            new Translation2d(trackWidthX / 2.0, trackWidthY / 2.0),
-            new Translation2d(trackWidthX / 2.0, -trackWidthY / 2.0),
-            new Translation2d(-trackWidthX / 2.0, trackWidthY / 2.0),
-            new Translation2d(-trackWidthX / 2.0, -trackWidthY / 2.0));
+        public static SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(getModuleTranslations());
+
+        private static Translation2d[] getModuleTranslations() {
+            return new Translation2d[] {
+                new Translation2d(trackWidthX / 2.0, trackWidthY / 2.0),
+                new Translation2d(trackWidthX / 2.0, -trackWidthY / 2.0),
+                new Translation2d(-trackWidthX / 2.0, trackWidthY / 2.0),
+                new Translation2d(-trackWidthX / 2.0, -trackWidthY / 2.0)
+            };
+        }
+
+        public static double getMaxAngularSpeed() {
+            return ModuleConstants.maxSpeed
+                / Arrays.stream(getModuleTranslations())
+                    .map(translation -> translation.getNorm())
+                    .max(Double::compare)
+                    .get();
+          }
     }
 
     public static class Conversions {
