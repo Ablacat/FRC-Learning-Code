@@ -4,6 +4,8 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
@@ -14,7 +16,7 @@ public final class Constants {
         public static final double maxSpeed = Units.feetToMeters(13.5);
 
         //CHECK VALUES IN RL
-        public static double wheelDiameter = Units.inchesToMeters(3);
+        public static double wheelDiameter = Units.inchesToMeters(4);
         public static double wheelCircumference = wheelDiameter * Math.PI;
         public static double driveGearRatio = 8.14; // 8.16 for mk3
         public static double angleGearRatio = ((150.0 / 7.0) / 1.0); // published angle gear reduction on Mk4i
@@ -26,18 +28,18 @@ public final class Constants {
         public static double anglePeakCurrentDuration = 0.1;
         public static boolean angleEnableCurrentLimit = true;
 
-        public static final int driveContinuousCurrentLimit = 35;
-        public static final int drivePeakCurrentLimit = 60; //CHECK WITH RL
-        public static final double drivePeakCurrentDuration = 0.1;
-        public static final boolean driveEnableCurrentLimit = true;
+        public static int driveContinuousCurrentLimit = 35;
+        public static int drivePeakCurrentLimit = 40; //CHECK WITH RL
+        public static double drivePeakCurrentDuration = 0.1;
+        public static boolean driveEnableCurrentLimit = true;
 
         //Neutral Modes
         public static NeutralMode angleNeutralMode = NeutralMode.Coast;
         public static NeutralMode driveNeutralMode = NeutralMode.Brake;
 
         //Loop Ramps
-        public static final double openLoopRamp = 0.25;
-        public static final double closedLoopRamp = 0.0;
+        public static double openLoopRamp = 0.25;
+        public static double closedLoopRamp = 0.0;
         
         // public static int encoderCPR = 4096;
         // public static double wheelDiameter = Units.inchesToMeters(3);
@@ -46,6 +48,21 @@ public final class Constants {
         // public static double turningEncoderDistancePerPulse = (2 * Math.PI) / (double) encoderCPR;
 
     }
+
+    public static class SwerveConstants {
+        public static int pigeonID = 1;
+        public static boolean invertGyro = false;
+
+        private static double trackWidthX = Units.inchesToMeters(20.5);
+        private static double trackWidthY = Units.inchesToMeters(20.5);
+
+        public static SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
+            new Translation2d(trackWidthX / 2.0, trackWidthY / 2.0),
+            new Translation2d(trackWidthX / 2.0, -trackWidthY / 2.0),
+            new Translation2d(-trackWidthX / 2.0, trackWidthY / 2.0),
+            new Translation2d(-trackWidthX / 2.0, -trackWidthY / 2.0));
+    }
+
     public static class Conversions {
         /**
          * @param positionCounts CANCoder Position Counts

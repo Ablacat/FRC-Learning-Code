@@ -22,7 +22,9 @@ import frc.robot.Constants.ModuleConstants;
 import frc.robot.util.CTREModuleState;
 
 public class SwerveModule {
-    public int moduleNumber;
+    private int moduleNumber;
+    private String moduleName;
+
     private Rotation2d angleOffset;
     private Rotation2d lastAngle;
 
@@ -30,11 +32,6 @@ public class SwerveModule {
     private final TalonFX angleMotor;
     private TalonFXConfiguration swerveAngleFXConfig;
     private TalonFXConfiguration swerveDriveFXConfig;
-
-    private boolean driveEncoderReversed;
-    private boolean angleEncoderReversed;
-    private boolean driveMotorReversed;
-    private boolean angleMotorReversed;
     
     private final CANCoder angleEncoder;
     private CANCoderConfiguration swerveCanCoderConfig;
@@ -54,44 +51,44 @@ public class SwerveModule {
     SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(driveKs.get(), driveKv.get(), driveKa.get());
 
     /**
+     * Swerve Module Constants to be used when creating swerve modules.
      * @param moduleNumber
+     * @param moduleName
      * @param driveMotorID
      * @param angleMotorID
-     * @param cancoderID
+     * @param canCoderID
      * @param angleOffset
-     * @param driveEncoderReversed
-     * @param angleEncoderReversed
-     * @param driveMotorReversed
-     * @param angleMotorReversed
      */
-    public SwerveModule(
-            int moduleNumber,
-            int driveMotorID,
-            int angleMotorID,
-            int cancoderID,
-            Rotation2d angleOffset,
-            boolean driveEncoderReversed,
-            boolean angleEncoderReversed,
-            boolean driveMotorReversed,
-            boolean angleMotorReversed) {
+    public SwerveModule(int moduleNumber, String moduleName, int driveMotorID, int angleMotorID, int canCoderID, double offset) {
         this.moduleNumber = moduleNumber;
-        this.angleOffset = angleOffset;
+        angleOffset = Rotation2d.fromDegrees(offset);
 
-        this.driveEncoderReversed = driveEncoderReversed;
-        this.angleEncoderReversed = angleEncoderReversed;
-        this.driveMotorReversed = driveMotorReversed;
-        this.angleMotorReversed = angleMotorReversed;
-
-        angleEncoder = new CANCoder(cancoderID);
+        angleEncoder = new CANCoder(canCoderID);
         configAngleEncoder();
 
-        angleMotor = new TalonFX(driveMotorID);
+        angleMotor = new TalonFX(angleMotorID);
         configAngleMotor();
 
         driveMotor = new TalonFX(driveMotorID);
         configDriveMotor();
 
         lastAngle = getState().angle;
+    }
+
+    public String getModuleName() {
+		return moduleName;
+	}
+
+	public void setModuleName(String moduleName) {
+		this.moduleName = moduleName;
+	}
+
+	public int getModuleNumber() {
+        return moduleNumber;
+    }
+
+    public void setModuleNumber(int moduleNumber) {
+        this.moduleNumber = moduleNumber;
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -138,7 +135,7 @@ public class SwerveModule {
         swerveCanCoderConfig = new CANCoderConfiguration();
 
         swerveCanCoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-        swerveCanCoderConfig.sensorDirection = angleEncoderReversed;
+        swerveCanCoderConfig.sensorDirection = false; //FOR MK4i/MK3
         swerveCanCoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
         swerveCanCoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
     }
@@ -160,7 +157,8 @@ public class SwerveModule {
         swerveAngleFXConfig.slot0.kF = 0;
         swerveAngleFXConfig.supplyCurrLimit = angleSupplyLimit;
 
-        angleMotor.setInverted(driveMotorReversed);
+        angleMotor.setInverted(true); //FOR MK4i
+        // angleMotor.setInverted(false); //FOR MK3
         angleMotor.setNeutralMode(ModuleConstants.angleNeutralMode);
         resetToAbsolute();
     }
@@ -184,7 +182,7 @@ public class SwerveModule {
         swerveDriveFXConfig.openloopRamp = ModuleConstants.openLoopRamp;
         swerveDriveFXConfig.closedloopRamp = ModuleConstants.closedLoopRamp;
 
-        driveMotor.setInverted(driveMotorReversed);
+        driveMotor.setInverted(false); //FOR MK4i/MK3
         driveMotor.setNeutralMode(ModuleConstants.driveNeutralMode);
         driveMotor.setSelectedSensorPosition(0);
     }
